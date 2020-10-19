@@ -1,10 +1,5 @@
-import os
 from flask_sqlalchemy import SQLAlchemy
 from app import app
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-databasePath = "sqlite:///"+os.path.join(basedir,"db.sqlite")
-app.config["SQLALCHEMY_DATABASE_URI"] = databasePath
 
 db = SQLAlchemy(app)
 
@@ -19,3 +14,7 @@ class UserModel(db.Model):
     
     def __repr__(self):
         return f"( {self.username}, {self.password} )"
+
+    @classmethod
+    def get_user(self,username):
+        return UserModel.query.filter_by(username=username).first()
