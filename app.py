@@ -3,7 +3,7 @@ import flask
 from flask_wtf import FlaskForm
 import os
 from user import User
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO,join_room
 from wtforms import (
     StringField,
     PasswordField,
@@ -111,6 +111,10 @@ def register():
 @socketio.on("message")
 def message(message):
     print(f"Received message: {message}")
+
+@socketio.on("join")
+def join(roomNumber):
+    join_room(roomNumber)
 
 if __name__ == "__main__":
     from database import UserModel,db
