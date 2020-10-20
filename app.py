@@ -3,6 +3,7 @@ import flask
 from flask_wtf import FlaskForm
 import os
 from user import User
+from flask_socketio import SocketIO
 from wtforms import (
     StringField,
     PasswordField,
@@ -28,6 +29,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = databasePath
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 login_manager = LoginManager()
 login_manager.init_app(app)
+socketio = SocketIO(app)
+
 
 @login_manager.user_loader
 def load_user(username):
@@ -92,18 +95,24 @@ def register():
         username = form.username.data
         password = form.password.data
         confirm = form.confirm.data
-
-        if(password == confirm):
-            newUser = UserModel(username,password)
-            db.session.add(newUser)
-            db.session.commit()
-            return redirect(url_for("index"))
+        if(UserModel.get_user(username) == None):
+            if(password == confirm):
+                newUser = UserModel(username,password)
+                db.session.add(newUser)
+                db.session.commit()
+                return redirect(url_for("index"))
+            else:
+                flash("Passwords must match","error")
         else:
-            flash("Passwords must match","error")
+            flash("Username already used","error")
         
     return render_template("register.html",form=form)
+
+@socketio.on("message")
+def message(message):
+    print(f"Received message: {message}")
 
 if __name__ == "__main__":
     from database import UserModel,db
     db.init_app(app)
-    app.run(debug=True,port=80)
+    socketio.run(app,debug=True,port=80)
