@@ -2,7 +2,7 @@
 const socket = io('ws://localhost:80');
 
 function sendMessage(){
-    var messageText = document.getElementById("textbox").value;
+    
 /*
     <div class="row no-gutters">
         <div class="col-5">
@@ -12,6 +12,10 @@ function sendMessage(){
         </div>
     </div>
 */
+
+    var textarea = document.getElementById("textbox");
+    var messageText = textarea.value;
+    textarea.value = "";
 
     row = document.createElement("div");
     row.className = "row no-gutters";
@@ -25,17 +29,31 @@ function sendMessage(){
     col.appendChild(message);
     row.appendChild(col);
 
-    document.getElementsByClassName("messages").appendChild(row);
+    document.getElementById("messages").appendChild(row);
 
-    //console.log(row);
+    //console.log(temp);
 
-    socket.send(message);
+    socket.send(messageText);
 }
 
 function joinRoom(roomNumber){
     socket.emit("join",roomNumber);
 }
 
-socket.on("connect",()=>{
-    socket.send("hello");
+socket.on("message",(messageText) =>{
+    row = document.createElement("div");
+    row.className = "row no-gutters";
+    col = document.createElement("div");
+    col.className = "col-5";
+    message = document.createElement("div");
+    message.className = "message";
+    
+    message.innerHTML = messageText;
+
+    col.appendChild(message);
+    row.appendChild(col);
+
+    console.log(messageText);
+
+    document.getElementById("messages").appendChild(row);
 });

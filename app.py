@@ -3,7 +3,7 @@ import flask
 from flask_wtf import FlaskForm
 import os
 from user import User
-from flask_socketio import SocketIO,join_room
+from flask_socketio import SocketIO,join_room,rooms
 from wtforms import (
     StringField,
     PasswordField,
@@ -109,11 +109,13 @@ def register():
     return render_template("register.html",form=form)
 
 @socketio.on("message")
-def message(message):
-    print(f"Received message: {message}")
+def message(msg):
+    socketio.emit("message",msg,include_self=False)
+    print(rooms())
 
 @socketio.on("join")
 def join(roomNumber):
+    print("joing room "+str(roomNumber))
     join_room(roomNumber)
 
 if __name__ == "__main__":
