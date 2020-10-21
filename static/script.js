@@ -1,6 +1,6 @@
 const url = "https://misteraschat.herokuapp.com/chat"
 
-const socket = io(`ws://${url}:80`);
+const socket = io(`wws://${url}:80`);
 
 var room = 0;
 var username = localStorage.getItem("username");
