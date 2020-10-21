@@ -8,3 +8,4 @@ flask-socketio
 flask-login
 flask-restful
 uwsgi
+flask-migrate
