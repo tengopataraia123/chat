@@ -116,7 +116,7 @@ def register():
 def message(msg):
     print(msg)
     
-    socketio.emit(msg["text"],include_self=False)
+    socketio.send(msg["text"],include_self=False)
     
     message = MessageModel()
     message.message = msg["text"]
@@ -138,7 +138,7 @@ def fetchMessages(room):
     messages = MessageModel.getMessages(room)
     for message in messages:
         mine = (message.username == current_user.username)
-        socketio.emit("old-messages",{"text":message.message,"mine":mine},broadcast=False)
+        socketio.emit("old-messages",{"text":message.message,"mine":mine},broadcast=False,include_self=True)
 
 Migrate(app,db)
 
