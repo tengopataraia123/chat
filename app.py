@@ -4,6 +4,9 @@ from flask_wtf import FlaskForm
 import os
 from user import User
 from flask_socketio import SocketIO,join_room,rooms
+from flask_migrate import Migrate
+from database import *
+from datetime import datetime
 from wtforms import (
     StringField,
     PasswordField,
@@ -30,6 +33,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 login_manager = LoginManager()
 login_manager.init_app(app)
 socketio = SocketIO(app)
+db.init_app(app)
 
 
 @login_manager.user_loader
@@ -110,15 +114,33 @@ def register():
 
 @socketio.on("message")
 def message(msg):
+    print(msg)
+    
     socketio.emit("message",msg,include_self=False)
-    print(rooms())
+    
+    message = MessageModel()
+    message.message = msg["text"]
+    message.room = msg["room"]
+    message.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    message.username = current_user.username
 
-@socketio.on("join")
+    db.session.add(message)
+    db.session.commit()
+
+
+@socketio.on("join-room")
 def join(roomNumber):
     print("joing room "+str(roomNumber))
-    join_room(roomNumber)
+    join_room(str(roomNumber))
+
+@socketio.on("fetch-messages")
+def fetchMessages(room):
+    messages = MessageModel.getMessages(room)
+    for message in messages:
+        mine = (message.username == current_user.username)
+        socketio.emit("old-messages",{"text":message.message,"mine":mine},broadcast=False)
+
+Migrate(app,db)
 
 if __name__ == "__main__":
-    from database import UserModel,db
-    db.init_app(app)
     socketio.run(app,debug=True,port=80)

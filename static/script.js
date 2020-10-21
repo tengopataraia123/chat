@@ -1,59 +1,61 @@
 
 const socket = io('ws://localhost:80');
 
-function sendMessage(){
-    
-/*
-    <div class="row no-gutters">
-        <div class="col-5">
-            <div class="message">
-                hello
-            </div>
-        </div>
-    </div>
-*/
+var room = 0;
 
+function addMessage(msg,received=true){
+    row = document.createElement("div");
+    row.className = "row no-gutters";
+    col = document.createElement("div");
+
+    if(received){
+        col.className = "col-5";
+    }else{
+        col.className = "col-5 offset-7";
+    }
+
+    message = document.createElement("div");
+    message.className = "message";
+    
+    message.innerHTML = msg;
+
+    col.appendChild(message);
+    row.appendChild(col);
+
+    document.getElementById("messages").appendChild(row);
+}
+
+function sendMessage(){
     var textarea = document.getElementById("textbox");
     var messageText = textarea.value;
     textarea.value = "";
 
-    row = document.createElement("div");
-    row.className = "row no-gutters";
-    col = document.createElement("div");
-    col.className = "col-5 offset-7";
-    message = document.createElement("div");
-    message.className = "message";
-    
-    message.innerHTML = messageText;
+    addMessage(messageText,false);
 
-    col.appendChild(message);
-    row.appendChild(col);
-
-    document.getElementById("messages").appendChild(row);
-
-    //console.log(temp);
-
-    socket.send(messageText);
+    socket.send({"text":messageText,"room":room});
 }
 
 function joinRoom(roomNumber){
-    socket.emit("join",roomNumber);
+    if(room){
+        socket.emit("leave-room",room)
+    }
+    socket.emit("join-room",roomNumber);
+    room = roomNumber;
+    fetchMessages(room);
 }
 
 socket.on("message",(messageText) =>{
-    row = document.createElement("div");
-    row.className = "row no-gutters";
-    col = document.createElement("div");
-    col.className = "col-5";
-    message = document.createElement("div");
-    message.className = "message";
-    
-    message.innerHTML = messageText;
-
-    col.appendChild(message);
-    row.appendChild(col);
-
-    console.log(messageText);
-
-    document.getElementById("messages").appendChild(row);
+    addMessage(messageText); 
 });
+
+socket.on("old-messages",(data) =>{
+    if(data.mine){
+        addMessage(data.text,false);
+    }else{
+        addMessage(data.text);
+    }
+});
+
+function fetchMessages(data){
+    socket.emit("fetch-messages",room);
+}
