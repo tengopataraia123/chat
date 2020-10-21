@@ -1,0 +1,7 @@
+flask
+flask-login
+flask-sqlalchemy
+gevent
+flask-wtf
+flask-socketio
+flask-login
