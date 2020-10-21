@@ -7,4 +7,4 @@ flask-wtf
 flask-socketio
 flask-login
 flask-restful
-wsgi
+uwsgi
