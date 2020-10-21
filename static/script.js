@@ -1,41 +1,61 @@
 
 const socket = io('ws://localhost:80');
 
-function sendMessage(){
-    var messageText = document.getElementById("textbox").value;
-/*
-    <div class="row no-gutters">
-        <div class="col-5">
-            <div class="message">
-                hello
-            </div>
-        </div>
-    </div>
-*/
+var room = 0;
 
+function addMessage(msg,received=true){
     row = document.createElement("div");
     row.className = "row no-gutters";
     col = document.createElement("div");
-    col.className = "col-5 offset-7";
+
+    if(received){
+        col.className = "col-5";
+    }else{
+        col.className = "col-5 offset-7";
+    }
+
     message = document.createElement("div");
     message.className = "message";
     
-    message.innerHTML = messageText;
+    message.innerHTML = msg;
 
     col.appendChild(message);
     row.appendChild(col);
 
-    document.getElementsByClassName("messages").appendChild(row);
+    document.getElementById("messages").appendChild(row);
+}
 
-    //console.log(row);
+function sendMessage(){
+    var textarea = document.getElementById("textbox");
+    var messageText = textarea.value;
+    textarea.value = "";
 
-    socket.send(message);
+    addMessage(messageText,false);
+
+    socket.send({"text":messageText,"room":room});
 }
 
 function joinRoom(roomNumber){
-    socket.emit("join",roomNumber);
+    if(room){
+        socket.emit("leave-room",room)
+    }
+    socket.emit("join-room",roomNumber);
+    room = roomNumber;
+    fetchMessages(room);
 }
 
-socket.on("connect",()=>{
-    socket.send("hello");
+socket.on("message",(messageText) =>{
+    addMessage(messageText); 
 });
+
+socket.on("old-messages",(data) =>{
+    if(data.mine){
+        addMessage(data.text,false);
+    }else{
+        addMessage(data.text);
+    }
+});
+
+function fetchMessages(data){
+    socket.emit("fetch-messages",room);
+}
