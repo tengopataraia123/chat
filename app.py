@@ -116,7 +116,7 @@ def register():
 def message(msg):
     print(msg)
     
-    socketio.emit("message",msg,include_self=False)
+    socketio.emit(msg["text"],include_self=False)
     
     message = MessageModel()
     message.message = msg["text"]
@@ -143,4 +143,4 @@ def fetchMessages(room):
 Migrate(app,db)
 
 if __name__ == "__main__":
-    socketio.run(app,debug=True,port=80)
+    socketio.run(app,host="0.0.0.0",debug=True,port=80)

@@ -1,5 +1,5 @@
 
-const socket = io('ws://localhost:80');
+const socket = io(`ws://192.168.1.4:80`);
 
 var room = 0;
 
@@ -23,6 +23,7 @@ function addMessage(msg,received=true){
     row.appendChild(col);
 
     document.getElementById("messages").appendChild(row);
+    document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
 }
 
 function sendMessage(){
