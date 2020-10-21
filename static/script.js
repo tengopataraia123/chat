@@ -61,8 +61,9 @@ socket.on("old-messages",(data) =>{
 
 function fetchMessages(data){
     var reqUrl = `/oldMessages?room=${room}`;
+    console.log(reqUrl)
     fetch(reqUrl)
     .then((data)=>{
-        console.log(data);
+        console.log(data.json());
     });
 }
