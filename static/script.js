@@ -1,5 +1,7 @@
 
-const socket = io(`ws://192.168.1.4:80`);
+const url = "localhost"
+
+const socket = io(`ws://${url}:80`);
 
 var room = 0;
 
@@ -58,5 +60,9 @@ socket.on("old-messages",(data) =>{
 });
 
 function fetchMessages(data){
-    socket.emit("fetch-messages",room);
+    var reqUrl = `/oldMessages?room=${room}`;
+    fetch(reqUrl)
+    .then((data)=>{
+        console.log(data.arrayBuffer());
+    });
 }

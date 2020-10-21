@@ -28,4 +28,7 @@ class MessageModel(db.Model):
 
     @staticmethod
     def getMessages(room):
-        return MessageModel.query.filter_by(room=room)
+        messageList = []
+        for message in MessageModel.query.filter_by(room=room).all():
+            messageList.append(message.message)
+        return messageList

@@ -3,10 +3,12 @@ import flask
 from flask_wtf import FlaskForm
 import os
 from user import User
-from flask_socketio import SocketIO,join_room,rooms
+from flask_socketio import SocketIO,join_room
 from flask_migrate import Migrate
 from database import *
 from datetime import datetime
+from flask_restful import Api
+from resources.OldMessages import OldMessageFetcher
 from wtforms import (
     StringField,
     PasswordField,
@@ -34,7 +36,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 socketio = SocketIO(app)
 db.init_app(app)
+api = Api(app)
 
+api.add_resource(OldMessageFetcher,'/oldMessages')
 
 @login_manager.user_loader
 def load_user(username):
@@ -132,13 +136,6 @@ def message(msg):
 def join(roomNumber):
     print("joing room "+str(roomNumber))
     join_room(str(roomNumber))
-
-@socketio.on("fetch-messages")
-def fetchMessages(room):
-    messages = MessageModel.getMessages(room)
-    for message in messages:
-        mine = (message.username == current_user.username)
-        socketio.emit("old-messages",{"text":message.message,"mine":mine},broadcast=False,include_self=True)
 
 Migrate(app,db)
 
