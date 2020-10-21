@@ -1,5 +1,4 @@
-
-const url = "localhost"
+const url = "https://misteraschat.herokuapp.com/chat"
 
 const socket = io(`ws://${url}:80`);
 
