@@ -4,6 +4,7 @@ const url = "localhost"
 const socket = io(`ws://${url}:80`);
 
 var room = 0;
+var username = localStorage.getItem("username");
 
 function addMessage(msg,received=true){
     row = document.createElement("div");
@@ -39,7 +40,10 @@ function sendMessage(){
 }
 
 function joinRoom(roomNumber){
-    if(room){
+
+    document.getElementById("messages").innerHTML = "";
+
+    if(room != roomNumber){
         socket.emit("leave-room",room)
     }
     socket.emit("join-room",roomNumber);
@@ -61,9 +65,20 @@ socket.on("old-messages",(data) =>{
 
 function fetchMessages(data){
     var reqUrl = `/oldMessages?room=${room}`;
-    console.log(reqUrl)
     fetch(reqUrl)
-    .then((data)=>{
-        console.log(data.json());
+    .then((response)=>{
+        return response.json();
+    }).then(data =>{
+        data.forEach((message) =>{
+            if(message.received){
+                addMessage(message.text);
+            }else{
+                addMessage(message.text,false);
+            }
+        });
     });
+}
+
+window.onload = (event) => {
+    joinRoom(room);
 }
