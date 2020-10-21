@@ -63,6 +63,6 @@ function fetchMessages(data){
     var reqUrl = `/oldMessages?room=${room}`;
     fetch(reqUrl)
     .then((data)=>{
-        console.log(data.arrayBuffer());
+        console.log(data);
     });
 }
