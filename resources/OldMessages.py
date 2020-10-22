@@ -13,5 +13,5 @@ class OldMessageFetcher(Resource):
         messages = MessageModel.getMessages(data["room"])
         messageList = []
         for message in messages:
-            messageList.append({"text":message.message,"received":message.username != current_user.username})
-        return messageList
+            messageList.append({"text":message.message,"username":message.username,"date":message.time})
+        return {"data":messageList,"user":current_user.username}

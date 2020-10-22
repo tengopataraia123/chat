@@ -1,11 +1,11 @@
-const url = "https://misteraschat.herokuapp.com/chat"
+const url = document.location.origin;
 
-const socket = io(url);
+const socket = io(url+":80");
 
 var room = 0;
 var username = localStorage.getItem("username");
 
-function addMessage(msg,received=true){
+function addMessage(msg,user="",received=true){
     row = document.createElement("div");
     row.className = "row no-gutters";
     col = document.createElement("div");
@@ -15,11 +15,20 @@ function addMessage(msg,received=true){
     }else{
         col.className = "col-5 offset-7";
     }
+    
+    username = document.createElement("div");
+    username.className = "username";
+    username.innerHTML = user;
 
     message = document.createElement("div");
     message.className = "message";
-    
-    message.innerHTML = msg;
+
+    messageText = document.createElement("div");
+    messageText.className = "messageText";
+    messageText.innerHTML = msg;
+
+    message.appendChild(username);
+    message.appendChild(messageText);
 
     col.appendChild(message);
     row.appendChild(col);
@@ -67,12 +76,12 @@ function fetchMessages(data){
     fetch(reqUrl)
     .then((response)=>{
         return response.json();
-    }).then(data =>{
-        data.forEach((message) =>{
-            if(message.received){
-                addMessage(message.text);
+    }).then(response =>{
+        response.data.forEach((message) =>{
+            if(message.username != response.user){
+                addMessage(message.text,message.username);
             }else{
-                addMessage(message.text,false);
+                addMessage(message.text,message.username,false);
             }
         });
     });
