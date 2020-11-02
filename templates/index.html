@@ -4,6 +4,12 @@
     </head>
     <body align="center">
         
+        {% for msg in get_flashed_messages() %}
+        {{ msg }}
+        </br>
+        {% endfor %}
+
+
         <form method="POST" style="padding-top: 10em;">
             {{ form.hidden_tag() }}
             {{ form.username.label }}

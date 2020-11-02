@@ -1,12 +1,5 @@
-import os
 from flask_sqlalchemy import SQLAlchemy
-from app import app
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-databasePath = "sqlite:///"+os.path.join(basedir,"db.sqlite")
-app.config["SQLALCHEMY_DATABASE_URI"] = databasePath
-
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 class UserModel(db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -19,3 +12,20 @@ class UserModel(db.Model):
     
     def __repr__(self):
         return f"( {self.username}, {self.password} )"
+
+    @classmethod
+    def get_user(self,username):
+        return UserModel.query.filter_by(username=username).first()
+
+class MessageModel(db.Model):
+    __tablename__ = "messages"
+
+    id = db.Column(db.Integer,primary_key=True)
+    room = db.Column(db.String)
+    username = db.Column(db.String)
+    message = db.Column(db.String)
+    time = db.Column(db.String)
+
+    @staticmethod
+    def getMessages(room):
+        return MessageModel.query.filter_by(room=room).all()
